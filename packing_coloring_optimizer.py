@@ -36,13 +36,11 @@ def solve_packing_coloring(G):
 
     # Constraint (3): For every pair of distinct vertices (v,u) and each color i,
     # if the distance between v and u is <= i, they cannot both be assigned color i.
+    distances = dict(nx.all_pairs_shortest_path_length(G))
     for i in range(1, k + 1):
         for v, u in itertools.combinations(G.nodes, 2):
-            try:
-                d = nx.shortest_path_length(G, source=v, target=u)
-            except nx.NetworkXNoPath:
-                continue  # No path => no constraint needed
-            if d <= i:
+            d = distances[v].get(u)
+            if d is not None and d <= i:
                 model += x[(v, i)] + x[(u, i)] <= 1, f"Pack_{v}_{u}_color_{i}"
 
     # Constraint (4): If a vertex v is assigned color i then i must be <= z.
