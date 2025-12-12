@@ -49,7 +49,10 @@ def solve_packing_coloring(G):
             model += i * x[(v, i)] <= z, f"MaxColor_{v}_{i}"
 
     # Solve the model
-    model.solve(pulp.CPLEX_PY(msg=False))
+    try:
+        model.solve(pulp.CPLEX_PY(msg=False))
+    except pulp.PulpSolverError:
+        model.solve(pulp.HiGHS(msg=False))
 
     if model.status == pulp.LpStatusOptimal:  # Optimal solution found
         z_val = z.varValue
